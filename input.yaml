@@ -1,0 +1,5 @@
+websites:
+- website: "https://www.google.gr"
+  interval: 0.25
+- website: "https://www.nba.com"
+interval: 0.34
