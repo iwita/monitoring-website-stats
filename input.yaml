@@ -1,5 +1,13 @@
 websites:
-- website: "https://www.google.gr"
-  interval: 0.25
-- website: "https://www.nba.com"
-interval: 0.34
+- url: "https://www.google.gr"
+  interval: 5000
+- url: "https://www.nba.com"
+  interval: 2000
+- url: "https://www.staples.com/"
+  interval: 10000
+- url: "https://www.amazon.com/"
+  interval: 1000
+- url: https://www.cultofmac.com/
+  interval: 1000
+
+
