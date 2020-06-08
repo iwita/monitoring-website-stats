@@ -1,6 +1,7 @@
 package info
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -47,6 +48,7 @@ func (i *Info) Update(status int, elapsedTime time.Duration) {
 
 	// Delete the outdated responses if any
 	if i.TotalResponses == i.Length {
+		i.TotalResponses--
 		responseToBeDeleted := i.ResponsesList[0]
 		i.SumResponses -= responseToBeDeleted.Delay
 		i.StatusCodesCount[responseToBeDeleted.Status]--
@@ -64,41 +66,43 @@ func (i *Info) Update(status int, elapsedTime time.Duration) {
 	// Update the maximum in the helping data structure
 	if i.TotalResponses == 0 {
 		i.MaxResponsesList = append(i.MaxResponsesList, elapsedTime)
+	} else {
+		// Update the max in the helping data structure
+		for j, el := range i.MaxResponsesList {
+			// remove all elements smaller than current
+			if el < elapsedTime {
+				i.MaxResponsesList[j] = elapsedTime
+				i.MaxResponsesList = i.MaxResponsesList[:j+1]
+			}
+		}
 	}
 
 	// Add info about the new item
 
-	// Update the max in the helping data structure
-	//tmp := make([]time.Duration, 0)
-	for j, el := range i.MaxResponsesList {
-		// remove all elements smaller than current
-		if el < elapsedTime {
-			i.MaxResponsesList[j] = elapsedTime
-			i.MaxResponsesList = i.MaxResponsesList[:j+1]
-		}
-
-	}
-	// add current at the end of the deque
-
 	i.StatusCodesCount[status]++
 	if status == 200 {
 		i.SuccessfulResponses++
-		i.TotalResponses++
 	}
+	i.TotalResponses++
 	i.ResponsesList = append(i.ResponsesList, &Response{
 		Delay:  elapsedTime,
 		Status: status,
 	})
-	if elapsedTime > i.MaxResponse {
-		i.MaxResponse = elapsedTime
-	}
 	i.SumResponses += elapsedTime
+}
 
-	// Add the newly added one
-
-	i.ResponsesList = append(i.ResponsesList, &Response{
-		Delay:  elapsedTime,
-		Status: status,
-	})
-
+func (i *Info) PrintInfo() {
+	if i.TotalResponses == 0 {
+		fmt.Println("Metrics currently unavailable")
+		return
+	}
+	average := time.Duration(int(i.SumResponses) / i.TotalResponses)
+	max := i.MaxResponsesList[0]
+	fmt.Printf("Average/Max response time: %v/%v\n", average, max)
+	for key, val := range i.StatusCodesCount {
+		fmt.Printf("Status %v => %v\n", key, val)
+	}
+	//fmt.Println()
+	fmt.Printf("Availability: %v%% \n", i.SuccessfulResponses*100/i.TotalResponses)
+	fmt.Println()
 }

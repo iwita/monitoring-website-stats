@@ -1,10 +1,10 @@
 websites:
 - url: "https://www.google.gr"
-  interval: 5000
+  interval: 1000
 - url: "https://www.nba.com"
   interval: 2000
 - url: "https://www.staples.com/"
-  interval: 10000
+  interval: 1000
 - url: "https://www.amazon.com/"
   interval: 1000
 - url: https://www.cultofmac.com/

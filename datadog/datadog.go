@@ -135,16 +135,16 @@ func (m *Monitor) addStatistics(wb Website, elapsedTime time.Duration, status in
 	m.StatsPerWebsite[wb.Url].OneHourInfo.Update(status, elapsedTime)
 	m.StatsPerWebsite[wb.Url].OverallInfo.Update(status, elapsedTime)
 
-	m.StatsPerWebsite[wb.Url].StatusCodesCount[status]++
-	if status == 200 {
-		m.StatsPerWebsite[wb.Url].SuccessfulResponses++
-	}
-	m.StatsPerWebsite[wb.Url].TotalResponses++
+	// m.StatsPerWebsite[wb.Url].StatusCodesCount[status]++
+	// if status == 200 {
+	// 	m.StatsPerWebsite[wb.Url].SuccessfulResponses++
+	// }
+	// m.StatsPerWebsite[wb.Url].TotalResponses++
 
-	m.StatsPerWebsite[wb.Url].ResponseTimes = append(m.StatsPerWebsite[wb.Url].ResponseTimes, elapsedTime)
-	if elapsedTime > m.StatsPerWebsite[wb.Url].MaxResponseTime {
-		m.StatsPerWebsite[wb.Url].MaxResponseTime = elapsedTime
-	}
+	// m.StatsPerWebsite[wb.Url].ResponseTimes = append(m.StatsPerWebsite[wb.Url].ResponseTimes, elapsedTime)
+	// if elapsedTime > m.StatsPerWebsite[wb.Url].MaxResponseTime {
+	// 	m.StatsPerWebsite[wb.Url].MaxResponseTime = elapsedTime
+	// }
 
 }
 
