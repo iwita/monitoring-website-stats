@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/iwita/monitoring/alert"
 	"github.com/iwita/monitoring/info"
 )
 
@@ -38,6 +39,7 @@ type Monitor struct {
 	StatsPerWebsite map[string]*Statistics
 	done            chan bool
 	mutex           *sync.Mutex
+	Alert           *alert.Alert
 }
 
 func NewMonitor() *Monitor {
@@ -48,6 +50,7 @@ func NewMonitor() *Monitor {
 		done:            make(chan bool),
 		StatsPerWebsite: make(map[string]*Statistics, 0),
 		mutex:           &sync.Mutex{},
+		Alert:           alert.NewAlert(0.8),
 	}
 }
 

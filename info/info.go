@@ -3,6 +3,8 @@ package info
 import (
 	"fmt"
 	"time"
+
+	"github.com/iwita/monitoring/alert"
 )
 
 type Response struct {
@@ -21,6 +23,7 @@ type Info struct {
 	StatusCodesCount    map[int]int
 	SuccessfulResponses int
 	TotalResponses      int
+	Alert               *alert.Alert
 }
 
 func NewInfo(duration, interval time.Duration) *Info {
@@ -41,6 +44,7 @@ func NewInfo(duration, interval time.Duration) *Info {
 		StatusCodesCount:    make(map[int]int, 0),
 		SuccessfulResponses: 0,
 		TotalResponses:      0,
+		Alert:               alert.NewAlert(0.8),
 	}
 }
 
