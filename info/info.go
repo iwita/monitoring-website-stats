@@ -23,10 +23,11 @@ type Info struct {
 	StatusCodesCount    map[int]int
 	SuccessfulResponses int
 	TotalResponses      int
+	hasAlert            bool
 	Alert               *alert.Alert
 }
 
-func NewInfo(duration, interval time.Duration) *Info {
+func NewInfo(duration, interval time.Duration, hasAlert bool) *Info {
 	var length int
 	if duration == time.Duration(0) {
 		// we have the unlimited case
@@ -34,7 +35,7 @@ func NewInfo(duration, interval time.Duration) *Info {
 	} else {
 		length = int(duration / interval)
 	}
-	return &Info{
+	i := &Info{
 		MaxResponse:         0,
 		ResponsesList:       make([]*Response, 0),
 		MaxResponsesList:    make([]time.Duration, 0),
@@ -44,8 +45,14 @@ func NewInfo(duration, interval time.Duration) *Info {
 		StatusCodesCount:    make(map[int]int, 0),
 		SuccessfulResponses: 0,
 		TotalResponses:      0,
-		Alert:               alert.NewAlert(0.8),
+		hasAlert:            false,
 	}
+	if hasAlert {
+		i.Alert = alert.NewAlert(0.8)
+		i.hasAlert = true
+	}
+	return i
+
 }
 
 func (i *Info) Update(status int, elapsedTime time.Duration) {
@@ -84,7 +91,7 @@ func (i *Info) Update(status int, elapsedTime time.Duration) {
 	// Add info about the new item
 
 	i.StatusCodesCount[status]++
-	if status == 200 {
+	if status >= 200 && status <= 300 {
 		i.SuccessfulResponses++
 	}
 	i.TotalResponses++
@@ -93,6 +100,29 @@ func (i *Info) Update(status int, elapsedTime time.Duration) {
 		Status: status,
 	})
 	i.SumResponses += elapsedTime
+
+	if i.hasAlert {
+		i.UpdateAlert()
+	}
+}
+
+func (i *Info) UpdateAlert() {
+	i.Alert.Availability = float64(float64(i.SuccessfulResponses) * 100 / float64(i.TotalResponses))
+	switch i.Alert.AlertState {
+	//case alert.Unknown:
+	case alert.Available:
+		if i.Alert.Availability < i.Alert.Threshold {
+			i.Alert.LastTimeUnavailable = append(i.Alert.LastTimeUnavailable, time.Now())
+			i.Alert.AlertState++
+		}
+	//case alert.FromAvailableToUnavailable:
+	//case alert.FromUnavailableToAvailable:
+	case alert.Unavailable:
+		if i.Alert.Availability > i.Alert.Threshold {
+			i.Alert.LastTimeUnavailable = append(i.Alert.LastTimeAvailable, time.Now())
+			i.Alert.AlertState--
+		}
+	}
 }
 
 func (i *Info) PrintInfo() {

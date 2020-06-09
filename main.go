@@ -63,8 +63,12 @@ func main() {
 		select {
 		case <-timer1.C:
 			fmt.Println("Last 10 minutes statistics")
+
 			for _, wb := range dd.Wbs {
 				fmt.Printf("Website: %v\n", wb.Url)
+				//print alert output
+				dd.StatsPerWebsite[wb.Url].TwoMinutesInfo.Alert.Print()
+				// print all the rest
 				dd.StatsPerWebsite[wb.Url].TenMinutesInfo.PrintInfo()
 			}
 
@@ -72,6 +76,7 @@ func main() {
 			for _, wb := range dd.Wbs {
 				fmt.Printf("Website: %v\n", wb.Url)
 				dd.StatsPerWebsite[wb.Url].OneHourInfo.PrintInfo()
+				dd.StatsPerWebsite[wb.Url].TwoMinutesInfo.Alert.Print()
 			}
 		}
 	}
