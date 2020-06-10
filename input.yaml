@@ -2,7 +2,7 @@ websites:
 - url: "https://www.google.gr"
   interval: 1000
 - url: "https://www.nba.com"
-  interval: 2000
+  interval: 1000
 - url: "https://www.staples.com/"
   interval: 1000
 - url: "https://www.amazon.com/"

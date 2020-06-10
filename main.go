@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/gookit/color"
 	"github.com/iwita/monitoring/datadog"
 	"gopkg.in/yaml.v2"
 )
@@ -68,6 +69,8 @@ func main() {
 	timer1 := time.NewTicker(time.Second * time.Duration(10))
 	timer2 := time.NewTicker(time.Minute * time.Duration(1))
 
+	yellow := color.FgYellow.Render
+	blue := color.FgBlue.Render
 	// Start the monitoring
 	go dd.Exec()
 
@@ -75,7 +78,7 @@ func main() {
 	for {
 		select {
 		case <-timer1.C:
-			fmt.Println("Last 10 minutes statistics")
+			fmt.Println(yellow("Last 10 minutes statistics"))
 
 			for _, wb := range dd.Wbs {
 				fmt.Printf("Website: %v\n", wb.Url)
@@ -86,6 +89,7 @@ func main() {
 			}
 
 		case <-timer2.C:
+			fmt.Println(yellow(blue("Last 1 hour statistics")))
 			for _, wb := range dd.Wbs {
 				fmt.Printf("Website: %v\n", wb.Url)
 				dd.StatsPerWebsite[wb.Url].TwoMinutesInfo.Alert.Print()

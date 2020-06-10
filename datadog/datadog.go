@@ -88,21 +88,20 @@ func (m *Monitor) manageSingleWebsite(wb Website) {
 
 // It is called when a new request needs to be sent to a website
 func (m *Monitor) monitorOnce(wb Website) {
-	var start time.Time
-	var elapsedTime time.Duration
+	var start, dnsStart, connectStart time.Time
+	var elapsedTime, dnsLookup, connectionEstablishment time.Duration
 	req, err := http.NewRequest("GET", wb.Url, nil)
 	if err != nil {
 		fmt.Printf("Error while sending the request to %v : %v", wb.Url, err)
 		return
 	}
 	trace := &httptrace.ClientTrace{
-		//ConnectStart: func(network, addr string) { connect = time.Now() },
-		//ConnectDone: func(network, addr string, err error) {
-		//fmt.Printf("Website: %v, Connect time: %v\n", wb.Url, time.Since(connect))
-		//},
+		ConnectStart: func(network, addr string) { connectStart = time.Now() },
+		DNSStart:     func(dnsinfo httptrace.DNSStartInfo) { dnsStart = time.Now() },
+		DNSDone:      func(dnsinfo httptrace.DNSDoneInfo) { dnsLookup = time.Since(dnsStart) },
+		ConnectDone:  func(network, addr string, err error) { connectionEstablishment = time.Since(connectStart) },
 		GotFirstResponseByte: func() {
 			elapsedTime = time.Since(start)
-
 		},
 	}
 	req = req.WithContext(httptrace.WithClientTrace(req.Context(), trace))
@@ -125,14 +124,14 @@ func (m *Monitor) addStatistics(wb Website, elapsedTime time.Duration, status in
 			TwoMinutesInfo: info.NewInfo(time.Duration(2)*time.Minute, time.Duration(wb.Interval)*time.Millisecond, true),
 			TenMinutesInfo: info.NewInfo(time.Duration(10)*time.Minute, time.Duration(wb.Interval)*time.Millisecond, false),
 			OneHourInfo:    info.NewInfo(time.Duration(1)*time.Hour, time.Duration(wb.Interval)*time.Millisecond, false),
-			OverallInfo:    info.NewInfo(time.Duration(0)*time.Hour, time.Duration(wb.Interval)*time.Millisecond, false),
+			//OverallInfo:    info.NewInfo(time.Duration(0)*time.Hour, time.Duration(wb.Interval)*time.Millisecond, false),
 		}
 	}
 
 	m.StatsPerWebsite[wb.Url].TwoMinutesInfo.Update(status, elapsedTime)
 	m.StatsPerWebsite[wb.Url].TenMinutesInfo.Update(status, elapsedTime)
 	m.StatsPerWebsite[wb.Url].OneHourInfo.Update(status, elapsedTime)
-	m.StatsPerWebsite[wb.Url].OverallInfo.Update(status, elapsedTime)
+	//m.StatsPerWebsite[wb.Url].OverallInfo.Update(status, elapsedTime)
 }
 
 func (m *Monitor) printStats() {

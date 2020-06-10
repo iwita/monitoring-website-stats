@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gookit/color"
 	"github.com/iwita/monitoring/alert"
 	"github.com/iwita/monitoring/heap"
 )
@@ -40,6 +41,7 @@ func NewInfo(duration, interval time.Duration, hasAlert bool) *Info {
 	} else {
 		length = int(duration / interval)
 	}
+	fmt.Printf(color.FgRed.Render("Created Info with length %v\n"), length)
 	i := &Info{
 		MaxResponse:         0,
 		ResponsesList:       make([]*Response, 0),
@@ -61,7 +63,6 @@ func NewInfo(duration, interval time.Duration, hasAlert bool) *Info {
 
 // Updates the information stored in a predefined time window
 func (i *Info) Update(status int, elapsedTime time.Duration) {
-
 	// 1. Delete the outdated responses if any
 	if i.TotalResponses == i.Length {
 		i.TotalResponses--
@@ -90,11 +91,28 @@ func (i *Info) Update(status int, elapsedTime time.Duration) {
 			// This way, if  the current max elements needs to be deleted and be excluded from the time window,
 			// we have the next max value stored
 			if el < elapsedTime {
-				i.MaxResponsesList[j] = elapsedTime
-				i.MaxResponsesList = i.MaxResponsesList[:j+1]
+				//i.MaxResponsesList[j] = elapsedTime
+				i.MaxResponsesList = i.MaxResponsesList[:j]
+				break
 			}
 		}
+		i.MaxResponsesList = append(i.MaxResponsesList, elapsedTime)
 	}
+
+	// if i.TotalResponses == i.Length {
+	// 	//fmt.Println(color.FgRed.Render("Total Responses == Total Length"))
+	// 	i.TotalResponses--
+	// 	responseToBeDeleted := i.ResponsesList[0]
+	// 	i.SumResponses -= responseToBeDeleted.Delay
+	// 	i.StatusCodesCount[responseToBeDeleted.Status]--
+	// 	if responseToBeDeleted.Status == 200 {
+	// 		i.SuccessfulResponses--
+	// 	}
+	// 	// Update the maximum in the respective Deque
+	// 	if responseToBeDeleted.Delay == i.MaxResponsesList[0] {
+	// 		i.MaxResponsesList = i.MaxResponsesList[1:]
+	// 	}
+	// }
 
 	// 2.2 Add info about the new item
 
@@ -141,6 +159,7 @@ func (i *Info) UpdateAlert() {
 
 // Prints the information stored
 func (i *Info) PrintInfo() {
+	fmt.Printf(color.FgRed.Render("%v\n"), i.MaxResponsesList)
 
 	if i.TotalResponses == 0 {
 		fmt.Println("Metrics currently unavailable")
@@ -152,7 +171,7 @@ func (i *Info) PrintInfo() {
 
 	average := time.Duration(int(i.SumResponses) / i.TotalResponses)
 	max := i.MaxResponsesList[0]
-	fmt.Printf("Average/Max/90th percentile response time: %v/%v/%v\n", average, max, percentile)
+	fmt.Printf("(Average/Max/90th percentile) response time: (%v/%v/%v)\n", average, max, percentile)
 	for key, val := range i.StatusCodesCount {
 		fmt.Printf("Status %v => %v\n", key, val)
 	}

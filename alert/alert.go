@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/gookit/color"
 )
 
 type State uint32
@@ -70,12 +72,16 @@ func (a *Alert) PrintTest() string {
 // Function that prints the alert
 func (a *Alert) Print() {
 
+	red := color.FgRed.Render
+	green := color.FgGreen.Render
+	//fmt.Printf("%s line %s library\n", red("Command"), green("color"))
+
 	if len(a.LastTimeAvailable) == len(a.LastTimeUnavailable) {
-		fmt.Printf("STATUS: DOWN, Availability: %v, Since: %v, Duration: %v\n", a.Availability, a.LastTimeUnavailable[len(a.LastTimeUnavailable)-1].Format("2006-01-02 15:04:05"),
+		fmt.Printf(red("STATUS: DOWN, Availability: %v, Since: %v, Duration: %v\n"), a.Availability, a.LastTimeUnavailable[len(a.LastTimeUnavailable)-1].Format("2006-01-02 15:04:05"),
 			time.Since(a.LastTimeUnavailable[len(a.LastTimeUnavailable)-1]))
 	} else if len(a.LastTimeAvailable) > len(a.LastTimeUnavailable) {
 
-		fmt.Printf("STATUS: UP, Availability: %v, Since: %v, Duration: %v\n", a.Availability, a.LastTimeAvailable[len(a.LastTimeAvailable)-1].Format("2006-01-02 15:04:05"), time.Since(a.LastTimeAvailable[len(a.LastTimeAvailable)-1]))
+		fmt.Printf(green("STATUS: UP, Availability: %v, Since: %v, Duration: %v\n"), a.Availability, a.LastTimeAvailable[len(a.LastTimeAvailable)-1].Format("2006-01-02 15:04:05"), time.Since(a.LastTimeAvailable[len(a.LastTimeAvailable)-1]))
 	}
 	fmt.Printf("Lower Threshold Violation	|	Upper Thereshold Violation\n")
 	for i := 0; i < len(a.LastTimeUnavailable); i++ {
