@@ -67,6 +67,7 @@ func (i *Info) Update(status int, elapsedTime time.Duration) {
 	if i.TotalResponses == i.Length {
 		i.TotalResponses--
 		responseToBeDeleted := i.ResponsesList[0]
+		i.ResponsesList = i.ResponsesList[1:]
 		i.SumResponses -= responseToBeDeleted.Delay
 		i.StatusCodesCount[responseToBeDeleted.Status]--
 		if responseToBeDeleted.Status == 200 {
@@ -159,7 +160,7 @@ func (i *Info) UpdateAlert() {
 
 // Prints the information stored
 func (i *Info) PrintInfo() {
-	fmt.Printf(color.FgRed.Render("%v\n"), i.MaxResponsesList)
+	//fmt.Printf(color.FgRed.Render("%v\n"), i.MaxResponsesList)
 
 	if i.TotalResponses == 0 {
 		fmt.Println("Metrics currently unavailable")
@@ -176,7 +177,7 @@ func (i *Info) PrintInfo() {
 		fmt.Printf("Status %v => %v\n", key, val)
 	}
 	fmt.Printf("Availability: %v%% \n", i.SuccessfulResponses*100/i.TotalResponses)
-	fmt.Println()
+	//fmt.Println()
 }
 
 func get90thPercentile(responses []*Response) time.Duration {

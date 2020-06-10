@@ -86,6 +86,17 @@ func main() {
 				dd.StatsPerWebsite[wb.Url].TwoMinutesInfo.Alert.Print()
 				// print all the rest
 				dd.StatsPerWebsite[wb.Url].TenMinutesInfo.PrintInfo()
+				final := time.Duration(int(dd.StatsPerWebsite[wb.Url].TenMinutesInfo.SumResponses) / dd.StatsPerWebsite[wb.Url].TenMinutesInfo.TotalResponses)
+				start := time.Duration(int(dd.StatsPerWebsite[wb.Url].OneHourInfo.SumResponses) / dd.StatsPerWebsite[wb.Url].OneHourInfo.TotalResponses)
+				percentage := float64((final - start) / start)
+				if percentage < 0 {
+					fmt.Printf("%v%% Faster than last hour average responses\n", abs(percentage)*100)
+				} else if percentage == 0 {
+					fmt.Println("Stable trend")
+				} else {
+					fmt.Printf("%v%% Slower than last hour average responses\n", percentage*100)
+				}
+				fmt.Println()
 			}
 
 		case <-timer2.C:
@@ -97,4 +108,10 @@ func main() {
 			}
 		}
 	}
+}
+func abs(j float64) float64 {
+	if j < 0 {
+		return -j
+	}
+	return j
 }

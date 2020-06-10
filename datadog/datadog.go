@@ -29,11 +29,6 @@ type Statistics struct {
 	OverallInfo    *info.Info
 }
 
-// type Response struct {
-// 	delay  time.Duration
-// 	status int
-// }
-
 // Monitor type is the main type of this package
 type Monitor struct {
 	Wbs             Websites
@@ -69,7 +64,7 @@ func (m *Monitor) exec() {
 
 	}
 	wg.Wait()
-	fmt.Println("After wait")
+	//fmt.Println("After wait")
 
 }
 
@@ -88,18 +83,18 @@ func (m *Monitor) manageSingleWebsite(wb Website) {
 
 // It is called when a new request needs to be sent to a website
 func (m *Monitor) monitorOnce(wb Website) {
-	var start, dnsStart, connectStart time.Time
-	var elapsedTime, dnsLookup, connectionEstablishment time.Duration
+	var start time.Time
+	var elapsedTime time.Duration
 	req, err := http.NewRequest("GET", wb.Url, nil)
 	if err != nil {
 		fmt.Printf("Error while sending the request to %v : %v", wb.Url, err)
 		return
 	}
 	trace := &httptrace.ClientTrace{
-		ConnectStart: func(network, addr string) { connectStart = time.Now() },
-		DNSStart:     func(dnsinfo httptrace.DNSStartInfo) { dnsStart = time.Now() },
-		DNSDone:      func(dnsinfo httptrace.DNSDoneInfo) { dnsLookup = time.Since(dnsStart) },
-		ConnectDone:  func(network, addr string, err error) { connectionEstablishment = time.Since(connectStart) },
+		//ConnectStart: func(network, addr string) { connectStart = time.Now() },
+		//DNSStart:     func(dnsinfo httptrace.DNSStartInfo) { dnsStart = time.Now() },
+		//DNSDone:      func(dnsinfo httptrace.DNSDoneInfo) { dnsLookup = time.Since(dnsStart) },
+		//ConnectDone:  func(network, addr string, err error) { connectionEstablishment = time.Since(connectStart) },
 		GotFirstResponseByte: func() {
 			elapsedTime = time.Since(start)
 		},
