@@ -12,6 +12,10 @@ type Response struct {
 	Status int
 }
 
+// Info is the main type of this package.
+// It inlcudes both raw and processed information about a specific time window
+// specified by 'Duration'
+// *Additionally, some of the Info types may include an Alert
 type Info struct {
 	MaxResponse         time.Duration
 	AverageResponse     time.Duration
@@ -52,12 +56,12 @@ func NewInfo(duration, interval time.Duration, hasAlert bool) *Info {
 		i.hasAlert = true
 	}
 	return i
-
 }
 
+// Updates the information stored in a predefined time window
 func (i *Info) Update(status int, elapsedTime time.Duration) {
 
-	// Delete the outdated responses if any
+	// 1. Delete the outdated responses if any
 	if i.TotalResponses == i.Length {
 		i.TotalResponses--
 		responseToBeDeleted := i.ResponsesList[0]
@@ -72,15 +76,18 @@ func (i *Info) Update(status int, elapsedTime time.Duration) {
 		}
 	}
 
-	// Push a new item
+	// 2. Push a new item
 
-	// Update the maximum in the helping data structure
+	// 2.1 Update the maximum in the helping data structure
 	if i.TotalResponses == 0 {
 		i.MaxResponsesList = append(i.MaxResponsesList, elapsedTime)
 	} else {
 		// Update the max in the helping data structure
 		for j, el := range i.MaxResponsesList {
 			// remove all elements smaller than current
+			// This helping array stores Max elements in the order they occur
+			// This way, if  the current max elements needs to be deleted and be excluded from the time window,
+			// we have the next max value stored
 			if el < elapsedTime {
 				i.MaxResponsesList[j] = elapsedTime
 				i.MaxResponsesList = i.MaxResponsesList[:j+1]
@@ -88,7 +95,7 @@ func (i *Info) Update(status int, elapsedTime time.Duration) {
 		}
 	}
 
-	// Add info about the new item
+	// 2.2 Add info about the new item
 
 	i.StatusCodesCount[status]++
 	if status >= 200 && status <= 300 {
@@ -99,6 +106,8 @@ func (i *Info) Update(status int, elapsedTime time.Duration) {
 		Delay:  elapsedTime,
 		Status: status,
 	})
+	// Keep the sum of the delays in the time window, in order to
+	// calculate the average in constant time
 	i.SumResponses += elapsedTime
 
 	if i.hasAlert {
@@ -106,17 +115,21 @@ func (i *Info) Update(status int, elapsedTime time.Duration) {
 	}
 }
 
+// Updates the alert's values
+// More specifically,
+// 1. Stores the current availability in the array
+// 2. If the current state is available, and needs to change, it stores the current time
+//    and moves to unavailable state.
+//    Else if the current state is unavailable, and needs to change, it stores the current time
+//    and moves back to the available state
 func (i *Info) UpdateAlert() {
 	i.Alert.Availability = float64(float64(i.SuccessfulResponses) * 100 / float64(i.TotalResponses))
 	switch i.Alert.AlertState {
-	//case alert.Unknown:
 	case alert.Available:
 		if i.Alert.Availability < i.Alert.Threshold {
 			i.Alert.LastTimeUnavailable = append(i.Alert.LastTimeUnavailable, time.Now())
 			i.Alert.AlertState++
 		}
-	//case alert.FromAvailableToUnavailable:
-	//case alert.FromUnavailableToAvailable:
 	case alert.Unavailable:
 		if i.Alert.Availability > i.Alert.Threshold {
 			i.Alert.LastTimeUnavailable = append(i.Alert.LastTimeAvailable, time.Now())
@@ -125,6 +138,7 @@ func (i *Info) UpdateAlert() {
 	}
 }
 
+// Prints the information stored
 func (i *Info) PrintInfo() {
 	if i.TotalResponses == 0 {
 		fmt.Println("Metrics currently unavailable")
@@ -136,7 +150,6 @@ func (i *Info) PrintInfo() {
 	for key, val := range i.StatusCodesCount {
 		fmt.Printf("Status %v => %v\n", key, val)
 	}
-	//fmt.Println()
 	fmt.Printf("Availability: %v%% \n", i.SuccessfulResponses*100/i.TotalResponses)
 	fmt.Println()
 }

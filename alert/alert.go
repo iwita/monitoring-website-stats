@@ -49,6 +49,7 @@ func NewAlert(t float64) *Alert {
 	return al
 }
 
+// Function in order to test the functionality of the alert
 func (a *Alert) PrintTest() string {
 	var res strings.Builder
 	if len(a.LastTimeAvailable) == len(a.LastTimeUnavailable) {
@@ -56,18 +57,17 @@ func (a *Alert) PrintTest() string {
 	} else if len(a.LastTimeAvailable) > len(a.LastTimeUnavailable) {
 		res.WriteString(fmt.Sprintf("STATUS: UP, Availability: %v, Since: %v\n", a.Availability, a.LastTimeAvailable[len(a.LastTimeAvailable)-1].Format("2006-01-02 15:04:05")))
 	}
-
 	res.WriteString(fmt.Sprintf("Lower Threshold Violation	|	Upper Thereshold Violation\n"))
-
 	for i := 0; i < len(a.LastTimeUnavailable); i++ {
 		res.WriteString(fmt.Sprint(a.LastTimeUnavailable[i].Format("2006-01-02 15:04:05"), "   "))
 		if i+1 < len(a.LastTimeAvailable) {
 			res.WriteString(fmt.Sprintf("%v\n", a.LastTimeAvailable[i].Format("2006-01-02 15:04:05")))
 		}
 	}
-
 	return res.String()
 }
+
+// Function that prints the alert
 func (a *Alert) Print() {
 
 	if len(a.LastTimeAvailable) == len(a.LastTimeUnavailable) {
@@ -77,9 +77,7 @@ func (a *Alert) Print() {
 
 		fmt.Printf("STATUS: UP, Availability: %v, Since: %v, Duration: %v\n", a.Availability, a.LastTimeAvailable[len(a.LastTimeAvailable)-1].Format("2006-01-02 15:04:05"), time.Since(a.LastTimeAvailable[len(a.LastTimeAvailable)-1]))
 	}
-
 	fmt.Printf("Lower Threshold Violation	|	Upper Thereshold Violation\n")
-
 	for i := 0; i < len(a.LastTimeUnavailable); i++ {
 		fmt.Print(a.LastTimeUnavailable[i])
 		if i+1 < len(a.LastTimeAvailable) {

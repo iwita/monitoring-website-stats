@@ -20,20 +20,21 @@ type Website struct {
 }
 
 type Websites []Website
+
+// The Statistics type is a struct that includes different durations of statistics information
 type Statistics struct {
-	//MaxResponseTime time.Duration
-	//ResponseTimes   []time.Duration
 	TwoMinutesInfo *info.Info
 	TenMinutesInfo *info.Info
 	OneHourInfo    *info.Info
 	OverallInfo    *info.Info
 }
 
-type Response struct {
-	delay  time.Duration
-	status int
-}
+// type Response struct {
+// 	delay  time.Duration
+// 	status int
+// }
 
+// Monitor type is the main type of this package
 type Monitor struct {
 	Wbs             Websites
 	UrlToWebsite    map[string]Website
@@ -43,8 +44,8 @@ type Monitor struct {
 	Alert           *alert.Alert
 }
 
+// Initialize the Monitor, by setting the default values and allocating space
 func NewMonitor() *Monitor {
-
 	return &Monitor{
 		Wbs:             make(Websites, 0),
 		UrlToWebsite:    make(map[string]Website, 0),
@@ -60,24 +61,24 @@ func (m *Monitor) Exec() {
 }
 
 func (m *Monitor) exec() {
-	//fmt.Println("Inside exec")
 	var wg sync.WaitGroup
+	// For each website, create a new goroutine
 	for _, wb := range m.Wbs {
 		wg.Add(1)
 		go m.manageSingleWebsite(wb)
 
 	}
 	wg.Wait()
-	//m.printStats()
 	fmt.Println("After wait")
 
 }
 
+// Go routine executed for each website
+// Waits until the ticker reaches the interval's predefined value
 func (m *Monitor) manageSingleWebsite(wb Website) {
 	for {
 		select {
 		case <-m.done:
-			//wg.Wait()
 			return
 		case <-wb.Timer.C:
 			m.monitorOnce(wb)
@@ -85,11 +86,15 @@ func (m *Monitor) manageSingleWebsite(wb Website) {
 	}
 }
 
+// It is called when a new request needs to be sent to a website
 func (m *Monitor) monitorOnce(wb Website) {
 	var start time.Time
 	var elapsedTime time.Duration
-	req, _ := http.NewRequest("GET", wb.Url, nil)
-	//fmt.Println("CheckPoint #1")
+	req, err := http.NewRequest("GET", wb.Url, nil)
+	if err != nil {
+		fmt.Printf("Error while sending the request to %v : %v", wb.Url, err)
+		return
+	}
 	trace := &httptrace.ClientTrace{
 		//ConnectStart: func(network, addr string) { connect = time.Now() },
 		//ConnectDone: func(network, addr string, err error) {
@@ -101,32 +106,20 @@ func (m *Monitor) monitorOnce(wb Website) {
 		},
 	}
 	req = req.WithContext(httptrace.WithClientTrace(req.Context(), trace))
-
-	// for {
-
-	//fmt.Println("CheckPoint #2")
 	start = time.Now()
-	//fmt.Println("CheckPoint #3")
 	res, err := http.DefaultTransport.RoundTrip(req)
-	//fmt.Println("CheckPoint #4")
 	if err != nil {
 		fmt.Println(err)
 	}
-	//add statistics
-	//fmt.Printf("Website: %v, Elapsed time: %v\n", wb.Url, elapsedTime)
-
 	m.mutex.Lock()
 	m.addStatistics(wb, elapsedTime, res.StatusCode)
-	//m.printStats(wb)
 	m.mutex.Unlock()
-	//time.Sleep(time.Duration(wb.Interval) * time.Millisecond)
-	//}
-
-	//wg.Done()
 }
 
+// Adds the newly extracted metrics into the statistics of the website
 func (m *Monitor) addStatistics(wb Website, elapsedTime time.Duration, status int) {
 
+	// Handle the case, where there are no previous metrics stored
 	if _, ok := m.StatsPerWebsite[wb.Url]; !ok {
 		m.StatsPerWebsite[wb.Url] = &Statistics{
 			TwoMinutesInfo: info.NewInfo(time.Duration(2)*time.Minute, time.Duration(wb.Interval)*time.Millisecond, true),
@@ -143,7 +136,6 @@ func (m *Monitor) addStatistics(wb Website, elapsedTime time.Duration, status in
 }
 
 func (m *Monitor) printStats() {
-
 	//Lock
 	for _, wb := range m.Wbs {
 		fmt.Println(wb.Url, m.StatsPerWebsite[wb.Url])
@@ -155,6 +147,6 @@ func (m *Monitor) printStats() {
   Calculates the Average of the responses on the fly
 */
 
-func getRunningAverage(n int, currentAverage, x time.Duration) time.Duration {
-	return (currentAverage*time.Duration(n) + x) / (time.Duration(n + 1))
-}
+// func getRunningAverage(n int, currentAverage, x time.Duration) time.Duration {
+// 	return (currentAverage*time.Duration(n) + x) / (time.Duration(n + 1))
+// }
