@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/iwita/monitoring/alert"
+	"github.com/iwita/monitoring/heap"
 )
 
 type Response struct {
@@ -140,16 +141,43 @@ func (i *Info) UpdateAlert() {
 
 // Prints the information stored
 func (i *Info) PrintInfo() {
+
 	if i.TotalResponses == 0 {
 		fmt.Println("Metrics currently unavailable")
 		return
 	}
+
+	// Calculate the 90th percentile of the responses time
+	percentile := get90thPercentile(i.ResponsesList)
+
 	average := time.Duration(int(i.SumResponses) / i.TotalResponses)
 	max := i.MaxResponsesList[0]
-	fmt.Printf("Average/Max response time: %v/%v\n", average, max)
+	fmt.Printf("Average/Max/90th percentile response time: %v/%v/%v\n", average, max, percentile)
 	for key, val := range i.StatusCodesCount {
 		fmt.Printf("Status %v => %v\n", key, val)
 	}
 	fmt.Printf("Availability: %v%% \n", i.SuccessfulResponses*100/i.TotalResponses)
 	fmt.Println()
+}
+
+func get90thPercentile(responses []*Response) time.Duration {
+	size := 0.1 * float64(len(responses))
+	minHeap := heap.NewMinHeap(int(size))
+	j := 0
+	for j < int(size) {
+		minHeap.Insert(int(responses[j].Delay))
+		j++
+	}
+	if minHeap.Size > 0 {
+		for j < len(responses) && minHeap.Size > 0 {
+			if int(responses[j].Delay) > minHeap.Peek() {
+				minHeap.Remove()
+				minHeap.Insert(int(responses[j].Delay))
+			}
+			j++
+		}
+		return time.Duration(minHeap.Peek())
+	}
+	return -1
+
 }

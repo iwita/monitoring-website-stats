@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/iwita/monitoring/datadog"
-
 	"gopkg.in/yaml.v2"
 )
 
@@ -40,15 +39,16 @@ func readFile(cfg *Configs, file string) error {
 
 func main() {
 
-	inputArray := []int{1, 2, 3, 4, 5, 6}
-	minHeap := heap.newMinHeap(len(inputArray))
-	for i := 0; i < len(inputArray); i++ {
-		minHeap.insert(inputArray[i])
-	}
-	minHeap.buildMinHeap()
-	for i := 0; i < len(inputArray); i++ {
-		fmt.Println(minHeap.remove())
-	}
+	// inputArray := []int{6, 2, 1, 4, 5, 4}
+	// minHeap := heap.NewMinHeap(len(inputArray))
+	// for i := 0; i < len(inputArray); i++ {
+	// 	minHeap.Insert(inputArray[i])
+	// }
+	// minHeap.BuildMinHeap()
+	// for i := 0; i < len(inputArray); i++ {
+	// 	fmt.Println(minHeap.Remove())
+	// }
+	// return
 	//fmt.Scanln()
 
 	var cfg Configs

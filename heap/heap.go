@@ -4,21 +4,21 @@ import "fmt"
 
 type minheap struct {
 	heapArray []int
-	size      int
+	Size      int
 	maxsize   int
 }
 
-func newMinHeap(maxsize int) *minheap {
+func NewMinHeap(maxsize int) *minheap {
 	minheap := &minheap{
 		heapArray: []int{},
-		size:      0,
+		Size:      0,
 		maxsize:   maxsize,
 	}
 	return minheap
 }
 
 func (m *minheap) leaf(index int) bool {
-	if index >= (m.size/2) && index <= m.size {
+	if index >= (m.Size/2) && index <= m.Size {
 		return true
 	}
 	return false
@@ -36,13 +36,13 @@ func (m *minheap) rightchild(index int) int {
 	return 2*index + 2
 }
 
-func (m *minheap) insert(item int) error {
-	if m.size >= m.maxsize {
+func (m *minheap) Insert(item int) error {
+	if m.Size >= m.maxsize {
 		return fmt.Errorf("Heal is ful")
 	}
 	m.heapArray = append(m.heapArray, item)
-	m.size++
-	m.upHeapify(m.size - 1)
+	m.Size++
+	m.upHeapify(m.Size - 1)
 	return nil
 }
 
@@ -67,10 +67,10 @@ func (m *minheap) downHeapify(current int) {
 	leftChildIndex := m.leftchild(current)
 	rightRightIndex := m.rightchild(current)
 	//If current is smallest then return
-	if leftChildIndex < m.size && m.heapArray[leftChildIndex] < m.heapArray[smallest] {
+	if leftChildIndex < m.Size && m.heapArray[leftChildIndex] < m.heapArray[smallest] {
 		smallest = leftChildIndex
 	}
-	if rightRightIndex < m.size && m.heapArray[rightRightIndex] < m.heapArray[smallest] {
+	if rightRightIndex < m.Size && m.heapArray[rightRightIndex] < m.heapArray[smallest] {
 		smallest = rightRightIndex
 	}
 	if smallest != current {
@@ -79,17 +79,21 @@ func (m *minheap) downHeapify(current int) {
 	}
 	return
 }
-func (m *minheap) buildMinHeap() {
-	for index := ((m.size / 2) - 1); index >= 0; index-- {
+func (m *minheap) BuildMinHeap() {
+	for index := ((m.Size / 2) - 1); index >= 0; index-- {
 		m.downHeapify(index)
 	}
 }
 
-func (m *minheap) remove() int {
+func (m *minheap) Remove() int {
 	top := m.heapArray[0]
-	m.heapArray[0] = m.heapArray[m.size-1]
-	m.heapArray = m.heapArray[:(m.size)-1]
-	m.size--
+	m.heapArray[0] = m.heapArray[m.Size-1]
+	m.heapArray = m.heapArray[:(m.Size)-1]
+	m.Size--
 	m.downHeapify(0)
 	return top
+}
+
+func (m *minheap) Peek() int {
+	return m.heapArray[0]
 }
