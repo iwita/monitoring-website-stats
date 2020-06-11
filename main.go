@@ -8,6 +8,7 @@ import (
 
 	"github.com/gookit/color"
 	"github.com/iwita/monitoring/info"
+	"github.com/iwita/monitoring/monitor"
 	"gopkg.in/yaml.v2"
 )
 
@@ -42,7 +43,7 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	dd := datadog.NewMonitor()
+	dd := monitor.NewMonitor()
 	for _, w := range cfg.Websites {
 		_, err := http.Get(w.Url)
 		if err != nil {
@@ -56,7 +57,7 @@ func main() {
 			}
 		}
 
-		dd.Wbs = append(dd.Wbs, datadog.Website{
+		dd.Wbs = append(dd.Wbs, monitor.Website{
 			Url:      w.Url,
 			Interval: w.Interval,
 			Timer:    time.NewTicker(time.Millisecond * time.Duration(w.Interval)),
@@ -95,7 +96,7 @@ func main() {
 				} else {
 					trend = fmt.Sprintf("%.2v%% slower than past hour", percentage*100)
 				}
-				fmt.Printf(datadog.OutputTemplate, websiteName, alertOut,
+				fmt.Printf(monitor.OutputTemplate, websiteName, alertOut,
 					res10m.Max, res10m.Average, res10m.Percentile, trend, res10m.Availability, res10m.StatusCodes,
 					res1h.Max, res1h.Average, res1h.Percentile, res1h.Availability, res1h.StatusCodes)
 			}
