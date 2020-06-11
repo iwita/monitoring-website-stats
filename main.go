@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/gookit/color"
-	"github.com/iwita/monitoring/datadog"
 	"github.com/iwita/monitoring/info"
 	"gopkg.in/yaml.v2"
 )

@@ -1,4 +1,4 @@
-package datadog
+package monitor
 
 const (
 	OutputTemplate = `%s
