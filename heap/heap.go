@@ -66,7 +66,6 @@ func (m *minheap) downHeapify(current int) {
 	smallest := current
 	leftChildIndex := m.leftchild(current)
 	rightRightIndex := m.rightchild(current)
-	//If current is smallest then return
 	if leftChildIndex < m.Size && m.heapArray[leftChildIndex] < m.heapArray[smallest] {
 		smallest = leftChildIndex
 	}

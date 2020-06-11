@@ -136,11 +136,3 @@ func (m *Monitor) printStats() {
 	}
 	//Unlock
 }
-
-/*
-  Calculates the Average of the responses on the fly
-*/
-
-// func getRunningAverage(n int, currentAverage, x time.Duration) time.Duration {
-// 	return (currentAverage*time.Duration(n) + x) / (time.Duration(n + 1))
-// }

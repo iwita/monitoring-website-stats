@@ -53,11 +53,15 @@ func NewAlert(t float64) *Alert {
 
 // Function in order to test the functionality of the alert
 func (a *Alert) PrintTest() string {
+	red := color.FgRed.Render
+	green := color.FgGreen.Render
 	var res strings.Builder
 	if len(a.LastTimeAvailable) == len(a.LastTimeUnavailable) {
-		res.WriteString(fmt.Sprintf("STATUS: DOWN, Availability: %v, Since: %v\n", a.Availability, a.LastTimeUnavailable[len(a.LastTimeUnavailable)-1].Format("2006-01-02 15:04:05")))
+		res.WriteString(fmt.Sprintf(red("STATUS: DOWN, Availability: %v, Since: %v, Duration: %v\n"), a.Availability, a.LastTimeUnavailable[len(a.LastTimeUnavailable)-1].Format("2006-01-02 15:04:05"),
+			time.Since(a.LastTimeUnavailable[len(a.LastTimeUnavailable)-1]).Round((time.Millisecond))))
 	} else if len(a.LastTimeAvailable) > len(a.LastTimeUnavailable) {
-		res.WriteString(fmt.Sprintf("STATUS: UP, Availability: %v, Since: %v\n", a.Availability, a.LastTimeAvailable[len(a.LastTimeAvailable)-1].Format("2006-01-02 15:04:05")))
+		res.WriteString(fmt.Sprintf(green("STATUS: UP, Availability: %v, Since: %v, Duration: %v\n"), a.Availability, a.LastTimeAvailable[len(a.LastTimeAvailable)-1].Format("2006-01-02 15:04:05"),
+			time.Since(a.LastTimeAvailable[len(a.LastTimeAvailable)-1]).Round(time.Millisecond)))
 	}
 	res.WriteString(fmt.Sprintf("Lower Threshold Violation	|	Upper Thereshold Violation\n"))
 	for i := 0; i < len(a.LastTimeUnavailable); i++ {
@@ -71,17 +75,15 @@ func (a *Alert) PrintTest() string {
 
 // Function that prints the alert
 func (a *Alert) Print() {
-
 	red := color.FgRed.Render
 	green := color.FgGreen.Render
-	//fmt.Printf("%s line %s library\n", red("Command"), green("color"))
-
 	if len(a.LastTimeAvailable) == len(a.LastTimeUnavailable) {
 		fmt.Printf(red("STATUS: DOWN, Availability: %v, Since: %v, Duration: %v\n"), a.Availability, a.LastTimeUnavailable[len(a.LastTimeUnavailable)-1].Format("2006-01-02 15:04:05"),
 			time.Since(a.LastTimeUnavailable[len(a.LastTimeUnavailable)-1]))
 	} else if len(a.LastTimeAvailable) > len(a.LastTimeUnavailable) {
 
-		fmt.Printf(green("STATUS: UP, Availability: %v, Since: %v, Duration: %v\n"), a.Availability, a.LastTimeAvailable[len(a.LastTimeAvailable)-1].Format("2006-01-02 15:04:05"), time.Since(a.LastTimeAvailable[len(a.LastTimeAvailable)-1]))
+		fmt.Printf(green("STATUS: UP, Availability: %v%%, Since: %v, Duration: %v\n"), a.Availability, a.LastTimeAvailable[len(a.LastTimeAvailable)-1].Format("2006-01-02 15:04:05"),
+			time.Since(a.LastTimeAvailable[len(a.LastTimeAvailable)-1]))
 	}
 	fmt.Printf("Lower Threshold Violation	|	Upper Thereshold Violation\n")
 	for i := 0; i < len(a.LastTimeUnavailable); i++ {

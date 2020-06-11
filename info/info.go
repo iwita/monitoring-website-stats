@@ -2,12 +2,20 @@ package info
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
-	"github.com/gookit/color"
 	"github.com/iwita/monitoring/alert"
 	"github.com/iwita/monitoring/heap"
 )
+
+type Result struct {
+	Max          time.Duration
+	Average      time.Duration
+	Percentile   time.Duration
+	Availability float64
+	StatusCodes  string
+}
 
 type Response struct {
 	Delay  time.Duration
@@ -41,7 +49,6 @@ func NewInfo(duration, interval time.Duration, hasAlert bool) *Info {
 	} else {
 		length = int(duration / interval)
 	}
-	fmt.Printf(color.FgRed.Render("Created Info with length %v\n"), length)
 	i := &Info{
 		MaxResponse:         0,
 		ResponsesList:       make([]*Response, 0),
@@ -100,21 +107,6 @@ func (i *Info) Update(status int, elapsedTime time.Duration) {
 		i.MaxResponsesList = append(i.MaxResponsesList, elapsedTime)
 	}
 
-	// if i.TotalResponses == i.Length {
-	// 	//fmt.Println(color.FgRed.Render("Total Responses == Total Length"))
-	// 	i.TotalResponses--
-	// 	responseToBeDeleted := i.ResponsesList[0]
-	// 	i.SumResponses -= responseToBeDeleted.Delay
-	// 	i.StatusCodesCount[responseToBeDeleted.Status]--
-	// 	if responseToBeDeleted.Status == 200 {
-	// 		i.SuccessfulResponses--
-	// 	}
-	// 	// Update the maximum in the respective Deque
-	// 	if responseToBeDeleted.Delay == i.MaxResponsesList[0] {
-	// 		i.MaxResponsesList = i.MaxResponsesList[1:]
-	// 	}
-	// }
-
 	// 2.2 Add info about the new item
 
 	i.StatusCodesCount[status]++
@@ -160,13 +152,10 @@ func (i *Info) UpdateAlert() {
 
 // Prints the information stored
 func (i *Info) PrintInfo() {
-	//fmt.Printf(color.FgRed.Render("%v\n"), i.MaxResponsesList)
-
 	if i.TotalResponses == 0 {
 		fmt.Println("Metrics currently unavailable")
 		return
 	}
-
 	// Calculate the 90th percentile of the responses time
 	percentile := get90thPercentile(i.ResponsesList)
 
@@ -177,7 +166,26 @@ func (i *Info) PrintInfo() {
 		fmt.Printf("Status %v => %v\n", key, val)
 	}
 	fmt.Printf("Availability: %v%% \n", i.SuccessfulResponses*100/i.TotalResponses)
-	//fmt.Println()
+}
+
+func (i *Info) GetResult() *Result {
+	result := &Result{}
+	if i.TotalResponses == 0 {
+		return nil
+	}
+
+	// Calculate the 90th percentile of the responses time
+	result.Percentile = get90thPercentile(i.ResponsesList).Round(time.Millisecond)
+	result.Average = time.Duration(int(i.SumResponses) / i.TotalResponses).Round(time.Millisecond)
+	result.Max = i.MaxResponsesList[0].Round(time.Millisecond)
+
+	temp := strings.Builder{}
+	for key, val := range i.StatusCodesCount {
+		fmt.Fprintf(&temp, "status %v => %v\n", key, val)
+	}
+	result.StatusCodes = temp.String()
+	result.Availability = (float64(i.SuccessfulResponses) * 100 / float64(i.TotalResponses))
+	return result
 }
 
 func get90thPercentile(responses []*Response) time.Duration {
@@ -199,5 +207,4 @@ func get90thPercentile(responses []*Response) time.Duration {
 		return time.Duration(minHeap.Peek())
 	}
 	return -1
-
 }
