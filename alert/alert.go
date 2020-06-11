@@ -63,9 +63,9 @@ func (a *Alert) PrintTest() string {
 		res.WriteString(fmt.Sprintf(green("STATUS: UP, Availability: %v, Since: %v, Duration: %v\n"), a.Availability, a.LastTimeAvailable[len(a.LastTimeAvailable)-1].Format("2006-01-02 15:04:05"),
 			time.Since(a.LastTimeAvailable[len(a.LastTimeAvailable)-1]).Round(time.Millisecond)))
 	}
-	res.WriteString(fmt.Sprintf("Lower Threshold Violation	|	Upper Thereshold Violation\n"))
+	res.WriteString(fmt.Sprintf("Unavailable		|	Available again\n"))
 	for i := 0; i < len(a.LastTimeUnavailable); i++ {
-		res.WriteString(fmt.Sprint(a.LastTimeUnavailable[i].Format("2006-01-02 15:04:05"), "   "))
+		res.WriteString(fmt.Sprint(a.LastTimeUnavailable[i].Format("2006-01-02 15:04:05"), "		"))
 		if i+1 < len(a.LastTimeAvailable) {
 			res.WriteString(fmt.Sprintf("%v\n", a.LastTimeAvailable[i].Format("2006-01-02 15:04:05")))
 		}

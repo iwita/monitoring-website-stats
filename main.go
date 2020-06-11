@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"time"
 
@@ -33,7 +34,6 @@ func readFile(cfg *Configs, file string) error {
 	if err != nil {
 		return err
 	}
-	//fmt.Println(cfg)
 	return nil
 }
 
@@ -45,6 +45,18 @@ func main() {
 	}
 	dd := datadog.NewMonitor()
 	for _, w := range cfg.Websites {
+		_, err := http.Get(w.Url)
+		if err != nil {
+			_, netErr := http.Get("https://www.google.com")
+			if netErr != nil {
+				fmt.Println("No internet connection")
+				os.Exit(1)
+			} else {
+				fmt.Println("Unable to reach", w.Url)
+				continue
+			}
+		}
+
 		dd.Wbs = append(dd.Wbs, datadog.Website{
 			Url:      w.Url,
 			Interval: w.Interval,
@@ -57,42 +69,6 @@ func main() {
 
 	// Start the monitoring
 	go dd.Exec()
-
-	// When the ticker ticks, the  appropriate output is printed
-	// for {
-	// 	select {
-	// 	case <-timer1.C:
-	// 		fmt.Println(yellow("Last 10 minutes statistics"))
-
-	// 		for _, wb := range dd.Wbs {
-	// 			fmt.Printf("Website: %v\n", wb.Url)
-	// 			// print alert output
-	// 			dd.StatsPerWebsite[wb.Url].TwoMinutesInfo.Alert.Print()
-	// 			// print all the rest
-	// 			dd.StatsPerWebsite[wb.Url].TenMinutesInfo.PrintInfo()
-	// 			final := time.Duration(int(dd.StatsPerWebsite[wb.Url].TenMinutesInfo.SumResponses) / dd.StatsPerWebsite[wb.Url].TenMinutesInfo.TotalResponses)
-	// 			start := time.Duration(int(dd.StatsPerWebsite[wb.Url].OneHourInfo.SumResponses) / dd.StatsPerWebsite[wb.Url].OneHourInfo.TotalResponses)
-	// 			percentage := float64((final - start) / start)
-	// 			if percentage < 0 {
-	// 				fmt.Printf("%v%% Faster than last hour average responses\n", abs(percentage)*100)
-	// 			} else if percentage == 0 {
-	// 				fmt.Println("Stable trend")
-	// 			} else {
-	// 				fmt.Printf("%v%% Slower than last hour average responses\n", percentage*100)
-	// 			}
-	// 			fmt.Println()
-	// 		}
-
-	// 	case <-timer2.C:
-	// 		fmt.Println(yellow(blue("Last 1 hour statistics")))
-	// 		for _, wb := range dd.Wbs {
-	// 			fmt.Printf("Website: %v\n", wb.Url)
-	// 			dd.StatsPerWebsite[wb.Url].TwoMinutesInfo.Alert.Print()
-	// 			dd.StatsPerWebsite[wb.Url].OneHourInfo.PrintInfo()
-	// 		}
-	// 	}
-	// }
-
 	var trend string
 	var res1h *info.Result = &info.Result{
 		Max:          -1,
@@ -114,14 +90,14 @@ func main() {
 				start := time.Duration(int(dd.StatsPerWebsite[wb.Url].OneHourInfo.SumResponses) / dd.StatsPerWebsite[wb.Url].OneHourInfo.TotalResponses)
 				percentage := float64(final-start) / float64(start)
 				if percentage < 0 {
-					trend = fmt.Sprintf("%.2v%% faster than past hour average responses", abs(percentage)*100)
+					trend = fmt.Sprintf("%.2v%% faster than past hour", abs(percentage)*100)
 				} else if percentage == 0 {
 					trend = fmt.Sprint("Stable trend")
 				} else {
-					trend = fmt.Sprintf("%.2v%% slower than past hour average responses", percentage*100)
+					trend = fmt.Sprintf("%.2v%% slower than past hour", percentage*100)
 				}
 				fmt.Printf(datadog.OutputTemplate, websiteName, alertOut,
-					res10m.Max, res10m.Average, res10m.Percentile, res10m.Availability, trend, res10m.StatusCodes,
+					res10m.Max, res10m.Average, res10m.Percentile, trend, res10m.Availability, res10m.StatusCodes,
 					res1h.Max, res1h.Average, res1h.Percentile, res1h.Availability, res1h.StatusCodes)
 			}
 

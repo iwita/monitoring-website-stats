@@ -104,6 +104,7 @@ func (m *Monitor) monitorOnce(wb Website) {
 	res, err := http.DefaultTransport.RoundTrip(req)
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 	m.mutex.Lock()
 	m.addStatistics(wb, elapsedTime, res.StatusCode)

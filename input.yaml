@@ -1,4 +1,6 @@
 websites:
+- url: "https://www.datadoghq.com"
+  interval: 1000
 - url: "https://www.google.gr"
   interval: 1000
 - url: "https://www.nba.com"
@@ -7,7 +9,9 @@ websites:
   interval: 1000
 - url: "https://www.amazon.com/"
   interval: 1000
-- url: https://www.cultofmac.com/
+- url: "https://www.cultofmac.com/"
   interval: 1000
+- url: "https://achilleas.com"
+  interval: 2000
 
 

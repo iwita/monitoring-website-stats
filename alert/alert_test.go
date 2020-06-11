@@ -20,7 +20,7 @@ func TestUP(t *testing.T) {
 	res := a.PrintTest()
 	want.WriteString(fmt.Sprintf(green("STATUS: UP, Availability: 90, Since: %v, Duration: %v\n"), start.Format("2006-01-02 15:04:05"),
 		time.Since(start).Round(time.Millisecond)))
-	want.WriteString("Lower Threshold Violation	|	Upper Thereshold Violation\n")
+	want.WriteString("Unavailable		|	Available again\n")
 	if res != want.String() {
 		t.Errorf("Got: %s\nWant: %s", res, want.String())
 	} else {
@@ -44,8 +44,8 @@ func TestUpDownTransition(t *testing.T) {
 
 	want.WriteString(fmt.Sprintf(red("STATUS: DOWN, Availability: %v, Since: %v, Duration: %v\n"), a.Availability, downAt.Format("2006-01-02 15:04:05"),
 		time.Since(downAt).Round(time.Millisecond)))
-	want.WriteString(fmt.Sprintf("Lower Threshold Violation	|	Upper Thereshold Violation\n"))
-	want.WriteString(fmt.Sprint(downAt.Format("2006-01-02 15:04:05"), "   "))
+	want.WriteString("Unavailable		|	Available again\n")
+	want.WriteString(fmt.Sprint(downAt.Format("2006-01-02 15:04:05"), "		"))
 
 	if res != want.String() {
 		t.Errorf("Got: %s\nWant: %s", res, want.String())
@@ -76,8 +76,8 @@ func TestUpDownUpTransition(t *testing.T) {
 
 	want.WriteString(fmt.Sprintf(green("STATUS: UP, Availability: 90, Since: %v, Duration: %v\n"), upAt.Format("2006-01-02 15:04:05"), time.Since(upAt).Round(time.Millisecond)))
 
-	want.WriteString(fmt.Sprintf("Lower Threshold Violation	|	Upper Thereshold Violation\n"))
-	want.WriteString(fmt.Sprint(downAt.Format("2006-01-02 15:04:05"), "   "))
+	want.WriteString("Unavailable		|	Available again\n")
+	want.WriteString(fmt.Sprint(downAt.Format("2006-01-02 15:04:05"), "		"))
 	want.WriteString(fmt.Sprintf("%v\n", upAt.Format("2006-01-02 15:04:05")))
 
 	if res != want.String() {
