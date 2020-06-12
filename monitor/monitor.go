@@ -17,6 +17,8 @@ type Website struct {
 	Url      string
 	Interval float64
 	Timer    *time.Ticker
+	Res10m   *info.Result
+	Res1h    *info.Result
 }
 
 type Websites []Website

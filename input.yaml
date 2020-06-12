@@ -11,7 +11,6 @@ websites:
   interval: 1000
 - url: "https://www.cultofmac.com/"
   interval: 1000
-- url: "https://achilleas.com"
-  interval: 2000
+
 
 

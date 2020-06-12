@@ -18,6 +18,7 @@ type Website struct {
 	Url      string  `yaml:"url"`
 	Interval float64 `yaml:"interval"`
 }
+
 type Configs struct {
 	Websites []Website `yaml:"websites"`
 }
@@ -61,6 +62,13 @@ func main() {
 			Url:      w.Url,
 			Interval: w.Interval,
 			Timer:    time.NewTicker(time.Millisecond * time.Duration(w.Interval)),
+			Res1h: &info.Result{
+				Max:          -1,
+				Average:      -1,
+				Percentile:   -1,
+				StatusCodes:  "",
+				Availability: -1,
+			},
 		})
 	}
 	// Initialize the two output counters
@@ -70,22 +78,13 @@ func main() {
 	// Start the monitoring
 	go dd.Exec()
 	var trend string
-	var res1h *info.Result = &info.Result{
-		Max:          -1,
-		Average:      -1,
-		Percentile:   -1,
-		StatusCodes:  "",
-		Availability: -1,
-	}
-	var res10m *info.Result
-
 	for {
 		select {
 		case <-timer1.C:
 			for _, wb := range dd.Wbs {
 				websiteName := color.FgBlue.Render(wb.Url)
 				alertOut := dd.StatsPerWebsite[wb.Url].TwoMinutesInfo.Alert.PrintTest()
-				res10m = dd.StatsPerWebsite[wb.Url].TenMinutesInfo.GetResult()
+				wb.Res10m = dd.StatsPerWebsite[wb.Url].TenMinutesInfo.GetResult()
 				final := time.Duration(int(dd.StatsPerWebsite[wb.Url].TenMinutesInfo.SumResponses) / dd.StatsPerWebsite[wb.Url].TenMinutesInfo.TotalResponses)
 				start := time.Duration(int(dd.StatsPerWebsite[wb.Url].OneHourInfo.SumResponses) / dd.StatsPerWebsite[wb.Url].OneHourInfo.TotalResponses)
 				percentage := float64(final-start) / float64(start)
@@ -97,13 +96,13 @@ func main() {
 					trend = fmt.Sprintf("%.2v%% slower than past hour", percentage*100)
 				}
 				fmt.Printf(monitor.OutputTemplate, websiteName, alertOut,
-					res10m.Max, res10m.Average, res10m.Percentile, trend, res10m.Availability, res10m.StatusCodes,
-					res1h.Max, res1h.Average, res1h.Percentile, res1h.Availability, res1h.StatusCodes)
+					wb.Res10m.Max, wb.Res10m.Average, wb.Res10m.Percentile, trend, wb.Res10m.Availability, wb.Res10m.StatusCodes,
+					wb.Res1h.Max, wb.Res1h.Average, wb.Res1h.Percentile, wb.Res1h.Availability, wb.Res1h.StatusCodes)
 			}
 
 		case <-timer2.C:
-			for _, wb := range dd.Wbs {
-				res1h = dd.StatsPerWebsite[wb.Url].OneHourInfo.GetResult()
+			for i, wb := range dd.Wbs {
+				dd.Wbs[i].Res1h = dd.StatsPerWebsite[wb.Url].OneHourInfo.GetResult()
 			}
 		}
 	}
