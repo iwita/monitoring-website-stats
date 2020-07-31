@@ -77,7 +77,7 @@ func (i *Info) Update(status int, elapsedTime time.Duration) {
 		i.ResponsesList = i.ResponsesList[1:]
 		i.SumResponses -= responseToBeDeleted.Delay
 		i.StatusCodesCount[responseToBeDeleted.Status]--
-		if responseToBeDeleted.Status == 200 {
+		if responseToBeDeleted.Status >= 200 && responseToBeDeleted.Status < 300 {
 			i.SuccessfulResponses--
 		}
 		// Update the maximum in the respective Deque
@@ -110,7 +110,7 @@ func (i *Info) Update(status int, elapsedTime time.Duration) {
 	// 2.2 Add info about the new item
 
 	i.StatusCodesCount[status]++
-	if status >= 200 && status <= 300 {
+	if status >= 200 && status < 300 {
 		i.SuccessfulResponses++
 	}
 	i.TotalResponses++
