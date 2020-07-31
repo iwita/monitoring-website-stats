@@ -19,6 +19,17 @@ The following metrics are calculated for each examined time window
 - When availability resumes for the past 2 minutes
 - Alerts remain visible on the page for historical reasons
 
+## Building and Executing
+You can either run: 
+```sh
+go run main.go
+```
+
+or create the executable and run:
+```sh
+go build && ./monitoring
+```
+
 ## Example input file
 ```yaml
 websites:
@@ -43,6 +54,7 @@ interval: 5000
 
 interval: 10000
 ```
+
 
 ## Ideas for further application improvement
 
