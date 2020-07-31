@@ -88,3 +88,6 @@ More generally this application could be scaled in a distributed system, where t
 
 ### 6. Live Input Configuration
 Another improvement idea would be to check the input periodically in order to add/remove any newly added/removed websites and change any configured intervals as well. 
+
+### 7. Notifications
+Email notifications or others
