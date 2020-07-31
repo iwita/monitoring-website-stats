@@ -23,6 +23,11 @@ The following metrics are calculated for each examined time window
 
 First of all, you need to have [Golang installed](https://golang.org/doc/install) in your system:
 
+Clone the repo
+```sh
+git clone https://github.com/iwita/monitoring
+cd monitoring
+```
 
 You can either run: 
 ```sh
