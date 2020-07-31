@@ -25,6 +25,11 @@ You can either run:
 go run main.go
 ```
 
+or find the precompiled executable in bin/monitoring
+```sh
+./bin/monitoring
+```
+
 or create the executable and run:
 ```sh
 go build && ./monitoring
