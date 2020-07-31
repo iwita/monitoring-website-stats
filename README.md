@@ -20,14 +20,13 @@ The following metrics are calculated for each examined time window
 - Alerts remain visible on the page for historical reasons
 
 ## Building and Executing
+
+First of all, you need to have [Golang installed](https://golang.org/doc/install) in your system:
+
+
 You can either run: 
 ```sh
 go run main.go
-```
-
-or find the precompiled executable in bin/monitoring
-```sh
-./bin/monitoring
 ```
 
 or create the executable and run:
