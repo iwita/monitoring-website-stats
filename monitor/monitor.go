@@ -88,6 +88,7 @@ func (m *Monitor) monitorOnce(wb Website) {
 	var start time.Time
 	var elapsedTime time.Duration
 	req, err := http.NewRequest("GET", wb.Url, nil)
+	//fmt.Println("After New Request")
 	if err != nil {
 		fmt.Printf("Error while sending the request to %v : %v", wb.Url, err)
 		return
@@ -104,12 +105,19 @@ func (m *Monitor) monitorOnce(wb Website) {
 	req = req.WithContext(httptrace.WithClientTrace(req.Context(), trace))
 	start = time.Now()
 	res, err := http.DefaultTransport.RoundTrip(req)
+	var sc int
+	// TODO:
+	// when the website is unavailable don't just return
 	if err != nil {
-		fmt.Println(err)
-		return
+		//fmt.Println(err)
+		elapsedTime = 0 * time.Millisecond
+		sc = 502
+	} else {
+		sc = res.StatusCode
 	}
+
 	m.mutex.Lock()
-	m.addStatistics(wb, elapsedTime, res.StatusCode)
+	m.addStatistics(wb, elapsedTime, sc)
 	m.mutex.Unlock()
 }
 

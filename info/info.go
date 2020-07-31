@@ -112,15 +112,19 @@ func (i *Info) Update(status int, elapsedTime time.Duration) {
 	i.StatusCodesCount[status]++
 	if status >= 200 && status < 300 {
 		i.SuccessfulResponses++
+		// Keep the sum of the delays in the time window, in order to
+		// calculate the average in constant time
+		i.SumResponses += elapsedTime
+
 	}
 	i.TotalResponses++
 	i.ResponsesList = append(i.ResponsesList, &Response{
 		Delay:  elapsedTime,
 		Status: status,
 	})
-	// Keep the sum of the delays in the time window, in order to
-	// calculate the average in constant time
-	i.SumResponses += elapsedTime
+
+	// Moved upwards only in case of successful response
+	//i.SumResponses += elapsedTime
 
 	if i.hasAlert {
 		i.UpdateAlert()
@@ -133,9 +137,9 @@ func (i *Info) Update(status int, elapsedTime time.Duration) {
 // 2. If the current state is available, and needs to change, it stores the current time
 //    and moves to unavailable state.
 //    Else if the current state is unavailable, and needs to change, it stores the current time
-//    and moves back to the available state
+//    and moves back to the available state.
 func (i *Info) UpdateAlert() {
-	i.Alert.Availability = float64(float64(i.SuccessfulResponses) * 100 / float64(i.TotalResponses))
+	i.Alert.Availability = float64(float64(i.SuccessfulResponses) / float64(i.TotalResponses))
 	switch i.Alert.AlertState {
 	case alert.Available:
 		if i.Alert.Availability < i.Alert.Threshold {
@@ -143,8 +147,8 @@ func (i *Info) UpdateAlert() {
 			i.Alert.AlertState++
 		}
 	case alert.Unavailable:
-		if i.Alert.Availability > i.Alert.Threshold {
-			i.Alert.LastTimeUnavailable = append(i.Alert.LastTimeAvailable, time.Now())
+		if i.Alert.Availability >= i.Alert.Threshold {
+			i.Alert.LastTimeAvailable = append(i.Alert.LastTimeAvailable, time.Now())
 			i.Alert.AlertState--
 		}
 	}

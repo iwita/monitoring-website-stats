@@ -11,6 +11,8 @@ websites:
   interval: 1000
 - url: "https://www.cultofmac.com/"
   interval: 1000
-
-
+- url: "https://atzeneto.tech/"
+  interval: 1000
+- url: "http://localhost:3000/graph"
+  interval: 1000
 

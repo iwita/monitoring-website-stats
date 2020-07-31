@@ -48,6 +48,9 @@ func main() {
 	}
 	dd := monitor.NewMonitor()
 	for _, w := range cfg.Websites {
+
+		// [1] TODO:
+		// include website unable to reach at the moment
 		_, err := http.Get(w.Url)
 		if err != nil {
 			_, netErr := http.Get("https://www.google.com")
@@ -56,7 +59,7 @@ func main() {
 				os.Exit(1)
 			} else {
 				fmt.Println("Unable to reach", w.Url)
-				continue
+				// [1] continue
 			}
 		}
 

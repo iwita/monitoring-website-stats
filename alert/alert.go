@@ -57,11 +57,13 @@ func (a *Alert) PrintTest() string {
 	green := color.FgGreen.Render
 	var res strings.Builder
 	if len(a.LastTimeAvailable) == len(a.LastTimeUnavailable) {
-		res.WriteString(fmt.Sprintf(red("STATUS: DOWN, Availability: %v, Since: %v, Duration: %v\n"), a.Availability, a.LastTimeUnavailable[len(a.LastTimeUnavailable)-1].Format("2006-01-02 15:04:05"),
+		res.WriteString(fmt.Sprintf(red("STATUS: DOWN, Availability: %0.2f%%, Since: %v, Duration: %v\n"), a.Availability*100, a.LastTimeUnavailable[len(a.LastTimeUnavailable)-1].Format("2006-01-02 15:04:05"),
 			time.Since(a.LastTimeUnavailable[len(a.LastTimeUnavailable)-1]).Round((time.Millisecond))))
 	} else if len(a.LastTimeAvailable) > len(a.LastTimeUnavailable) {
-		res.WriteString(fmt.Sprintf(green("STATUS: UP, Availability: %v, Since: %v, Duration: %v\n"), a.Availability, a.LastTimeAvailable[len(a.LastTimeAvailable)-1].Format("2006-01-02 15:04:05"),
+		res.WriteString(fmt.Sprintf(green("STATUS: UP, Availability: %0.2f%%, Since: %v, Duration: %v\n"), a.Availability*100, a.LastTimeAvailable[len(a.LastTimeAvailable)-1].Format("2006-01-02 15:04:05"),
 			time.Since(a.LastTimeAvailable[len(a.LastTimeAvailable)-1]).Round(time.Millisecond)))
+	} else {
+		fmt.Println("Inside the else statement in alert.go")
 	}
 	res.WriteString(fmt.Sprintf("Unavailable		|	Available again\n"))
 	for i := 0; i < len(a.LastTimeUnavailable); i++ {
@@ -78,11 +80,11 @@ func (a *Alert) Print() {
 	red := color.FgRed.Render
 	green := color.FgGreen.Render
 	if len(a.LastTimeAvailable) == len(a.LastTimeUnavailable) {
-		fmt.Printf(red("STATUS: DOWN, Availability: %v, Since: %v, Duration: %v\n"), a.Availability, a.LastTimeUnavailable[len(a.LastTimeUnavailable)-1].Format("2006-01-02 15:04:05"),
+		fmt.Printf(red("STATUS: DOWN, Availability: %0.2f, Since: %v, Duration: %v\n"), a.Availability*100, a.LastTimeUnavailable[len(a.LastTimeUnavailable)-1].Format("2006-01-02 15:04:05"),
 			time.Since(a.LastTimeUnavailable[len(a.LastTimeUnavailable)-1]))
 	} else if len(a.LastTimeAvailable) > len(a.LastTimeUnavailable) {
 
-		fmt.Printf(green("STATUS: UP, Availability: %v%%, Since: %v, Duration: %v\n"), a.Availability, a.LastTimeAvailable[len(a.LastTimeAvailable)-1].Format("2006-01-02 15:04:05"),
+		fmt.Printf(green("STATUS: UP, Availability: %v%%, Since: %v, Duration: %v\n"), a.Availability*100, a.LastTimeAvailable[len(a.LastTimeAvailable)-1].Format("2006-01-02 15:04:05"),
 			time.Since(a.LastTimeAvailable[len(a.LastTimeAvailable)-1]))
 	}
 	fmt.Printf("Lower Threshold Violation	|	Upper Thereshold Violation\n")
