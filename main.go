@@ -6,6 +6,8 @@ import (
 	"os"
 	"time"
 
+	"math"
+
 	"github.com/gookit/color"
 	"github.com/iwita/monitoring/info"
 	"github.com/iwita/monitoring/monitor"
@@ -89,7 +91,7 @@ func main() {
 				start := time.Duration(int(dd.StatsPerWebsite[wb.Url].OneHourInfo.SumResponses) / dd.StatsPerWebsite[wb.Url].OneHourInfo.TotalResponses)
 				percentage := float64(final-start) / float64(start)
 				if percentage < 0 {
-					trend = fmt.Sprintf("%.2v%% faster than past hour", abs(percentage)*100)
+					trend = fmt.Sprintf("%.2v%% faster than past hour", math.Abs(percentage)*100)
 				} else if percentage == 0 {
 					trend = fmt.Sprint("Stable trend")
 				} else {
@@ -106,11 +108,4 @@ func main() {
 			}
 		}
 	}
-}
-
-func abs(j float64) float64 {
-	if j < 0 {
-		return -j
-	}
-	return j
 }
