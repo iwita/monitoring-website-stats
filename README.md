@@ -1,4 +1,4 @@
-# Monitoring
+# Monitoring Website statistics
 
 ## What is it?
 This is a console program that checks availability and monitors various metrics from websites.
