@@ -58,7 +58,8 @@ func main() {
 				fmt.Println("No internet connection")
 				os.Exit(1)
 			} else {
-				fmt.Println("Unable to reach", w.Url)
+				//fmt.Println("Unable to reach", w.Url)
+				// fmt.Println(err)
 				// [1] continue
 			}
 		}
@@ -77,8 +78,8 @@ func main() {
 		})
 	}
 	// Initialize the two output counters
-	timer1 := time.NewTicker(time.Second * time.Duration(10))
-	timer2 := time.NewTicker(time.Minute * time.Duration(1))
+	timer1 := time.NewTicker(time.Second * time.Duration(50))
+	timer2 := time.NewTicker(time.Minute * time.Duration(3))
 
 	// Start the monitoring
 	go dd.Exec()

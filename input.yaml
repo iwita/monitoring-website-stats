@@ -1,18 +1,4 @@
 websites:
-- url: "https://www.datadoghq.com"
-  interval: 1000
-- url: "https://www.google.gr"
-  interval: 1000
-- url: "https://www.nba.com"
-  interval: 1000
-- url: "https://www.staples.com/"
-  interval: 1000
-- url: "https://www.amazon.com/"
-  interval: 1000
-- url: "https://www.cultofmac.com/"
-  interval: 1000
-- url: "https://atzeneto.tech/"
-  interval: 1000
-- url: "http://localhost:3000/graph"
+- url: "https://microlab.ntua.gr"
   interval: 1000
 

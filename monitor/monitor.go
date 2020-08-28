@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptrace"
+	"strings"
 	"sync"
 	"time"
 
@@ -109,9 +110,13 @@ func (m *Monitor) monitorOnce(wb Website) {
 	// TODO:
 	// when the website is unavailable don't just return
 	if err != nil {
-		//fmt.Println(err)
+		fmt.Println(err)
 		elapsedTime = 0 * time.Millisecond
-		sc = 502
+		if strings.Contains(err.Error(), "i/o timeout") {
+			sc = 408
+		} else if strings.Contains(err.Error(), "no such host") {
+			sc = 502
+		}
 	} else {
 		sc = res.StatusCode
 	}
