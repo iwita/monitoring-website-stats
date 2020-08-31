@@ -64,6 +64,8 @@ interval: 5000
 interval: 10000
 ```
 
+### TODO
+- Add response timeoutm as user input
 
 ## Ideas for further application improvement
 
