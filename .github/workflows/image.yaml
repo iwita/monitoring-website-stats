@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: FROM golang:1.16-alpine
+    runs-on: golang:1.16-alpine
 
     steps:
       - name: checkout code
