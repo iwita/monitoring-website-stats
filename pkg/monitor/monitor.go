@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/iwita/monitoring/alert"
-	"github.com/iwita/monitoring/info"
+	"github.com/iwita/monitoring-website-stats/pkg/alert"
+	"github.com/iwita/monitoring-website-stats/pkg/info"
 )
 
 const MaxInt = int(^uint(0) >> 1)

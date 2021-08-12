@@ -1,4 +1,4 @@
-module github.com/iwita/monitoring
+module github.com/iwita/monitoring-website-stats
 
 go 1.13
 
