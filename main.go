@@ -78,7 +78,7 @@ func main() {
 		})
 	}
 	// Initialize the two output counters
-	timer1 := time.NewTicker(time.Second * time.Duration(50))
+	timer1 := time.NewTicker(time.Second * time.Duration(3))
 	timer2 := time.NewTicker(time.Minute * time.Duration(3))
 
 	// Start the monitoring
@@ -101,6 +101,7 @@ func main() {
 				} else {
 					trend = fmt.Sprintf("%.2v%% slower than past hour", percentage*100)
 				}
+				// fmt.Println(monitor.Header)
 				fmt.Printf(monitor.OutputTemplate, websiteName, alertOut,
 					wb.Res10m.Max, wb.Res10m.Average, wb.Res10m.Percentile, trend, wb.Res10m.Availability, wb.Res10m.StatusCodes,
 					wb.Res1h.Max, wb.Res1h.Average, wb.Res1h.Percentile, wb.Res1h.Availability, wb.Res1h.StatusCodes)

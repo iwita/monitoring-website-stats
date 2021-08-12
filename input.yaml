@@ -1,4 +1,9 @@
 websites:
 - url: "https://microlab.ntua.gr"
   interval: 1000
+- url: "https://www.nba.com"
+  interval: 1000
+- url: "https://www.amazon.com"
+  interval: 1000
+
 
