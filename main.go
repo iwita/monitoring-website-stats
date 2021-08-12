@@ -42,7 +42,7 @@ func readFile(cfg *Configs, file string) error {
 
 func main() {
 	var cfg Configs
-	err := readFile(&cfg, "input.yaml")
+	err := readFile(&cfg, "files/input.yaml")
 	if err != nil {
 		fmt.Println(err)
 	}
