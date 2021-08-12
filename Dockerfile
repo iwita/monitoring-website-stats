@@ -6,6 +6,7 @@ COPY go.mod ./
 COPY go.sum ./
 RUN go mod download
 COPY *.go ./
+COPY pkg/ ./
 COPY input.yaml ./
 
 RUN go build -o /monitor

@@ -9,8 +9,8 @@ import (
 	"math"
 
 	"github.com/gookit/color"
-	"github.com/iwita/monitoring/info"
-	"github.com/iwita/monitoring/monitor"
+	"github.com/iwita/monitoring/pkg/info"
+	"github.com/iwita/monitoring/pkg/monitor"
 	"gopkg.in/yaml.v2"
 )
 
