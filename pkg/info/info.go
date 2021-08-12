@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/iwita/monitoring/alert"
-	"github.com/iwita/monitoring/heap"
+	"github.com/iwita/monitoring/pkg/alert"
+	"github.com/iwita/monitoring/pkg/heap"
 )
 
 type Result struct {
