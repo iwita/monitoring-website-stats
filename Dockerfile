@@ -12,7 +12,7 @@ RUN go clean -modcache
 RUN go mod download
 COPY *.go ./
 COPY pkg/ ./pkg
-COPY input.yaml ./
+COPY files ./files
 
 
 RUN go build -o ./monitor
